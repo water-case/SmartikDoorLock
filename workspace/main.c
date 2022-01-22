@@ -10,7 +10,7 @@ int main(void)
 	// 초기 셋팅 함수
 	Settinginitial();
 
-	// 초기 아틱 성정
+	// 초기 아틱 설정
 	artikvariable.initime=timer->get_tick();
 
 	// 기기내 저장된 비밀번호 읽어오기
