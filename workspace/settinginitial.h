@@ -3,7 +3,6 @@
 
 #include "main.h"
 
-// ¾ÕÀ¸·Î »ç¿ëÇÒ ÇÉµéÀÇ ¸®´ª½º ¸ÊÇÎ
 #define KEY0		128		//GPIO0
 #define KEY1		129		//GPIO1
 #define KEY2		130		//GPIO2
@@ -14,36 +13,36 @@
 #define MOTOR0		0//0		//GPIO7
 #define MOTOR1		26//26		//GPIO8
 #define BUTTON		27//27			//GPIO9
-// ADC´Â 12bits -> 0~4095
-#define M_PIN		0	//¸ğ¼Ç ¼¾¼­
-#define T_PIN		1	//Á¢Á¡ ¼¾¼­
-#define B_PIN		2	//¹®¿­¸² ¹öÆ° ¼¾¼­
-#define D_PIN		3	//¹®´İÈù°Å Å½ÁöÇÏ´Â ¼¾¼­
-//PWM ÇÉ »ç¿ë
-#define LED0		((0 << 8) | 2)	//Å°ÆĞµå LED
+// ADCëŠ” 12bits -> 0~4095
+#define M_PIN		0	// ëª¨ì…˜ ì„¼ì„œ
+#define T_PIN		1	// ì ‘ì  ì„¼ì„œ
+#define B_PIN		2	// ë¬¸ì—´ë¦¼ ë²„íŠ¼ ì„¼ì„œ
+#define D_PIN		3	// ë¬¸ ë‹«í˜ íƒì§€ì„¼ì„œ
+// PWM í•€ ì‚¬ìš©
+#define LED0		((0 << 8) | 2)	// í‚¤íŒ¨ë“œ LED
 #define close		0
 #define open		1
 
 enum {
-	key0=0,		//Å°ÆĞµå½ÅÈ£¼±		GPIO0
-	key1,		//				GPIO1
+	key0=0,		// GPIO0 í‚¤íŒ¨ë“œ ì‹ í˜¸ì„ 
+	key1,		// GPIO1
 	key2,
 	key3,
 	key4,
 	key5,
-	key6,		//				GPIO6
-	motor0,		//¹®¿­¸²			GPIO7
-	motor1,		//¹®´İÈû			GPIO8
-	button		//½ºÀ§Ä¡			GPIO9
+	key6,		// GPIO6
+	motor0,		// GPIO7 ë¬¸ì—´ë¦¼
+	motor1,		// GPIO8 ë¬¸ë‹«í˜
+	button		// GPIO9 ìŠ¤ìœ„ì¹˜
 };
 enum{
-	m_pin,	 	//¸ğ¼Ç¼¾¼­			ADC0
-	t_pin,		//±â¿ï±â ¼¾¼­ 		ADC1
-	b_pin,		//¹®¿­¸² ¹öÆ° 		ADC2
-	d_pin,		//¹®´İÈû °¨Áö ¼¾¼­ 	ADC3
+	m_pin,	 	// ADC0 ëª¨ì…˜ ì„¼ì„œ
+	t_pin,		// ADC1 ê¸°ìš¸ê¸° ì„¼ì„œ
+	b_pin,		// ADC2 ë¬¸ì—´ë¦¼ ë²„íŠ¼
+	d_pin,		// ADC3 ë¬¸ë‹«í˜ ê°ì§€ ì„¼ì„œ
 };
 enum{
-	led0		//Å°ÆĞµå LED		pwm0
+	led0		// pwm0 í‚¤íŒ¨ë“œ LED
 };
 
 struct gpio_pins {
@@ -61,7 +60,7 @@ struct pwm_pins{
 
 struct boolvariable{
 	bool interupt_timer;
-	bool flash_timer;		//¾ÆÁ÷¹Ì»ç¿ë
+	bool flash_timer;
 	bool keypad_timer;
 	bool t_timer;
 	bool door;
@@ -94,12 +93,12 @@ struct charvariable{
 };
 
 struct intvariable{
-	int timeout_id;	// value -> adc »ç¿ë timeout_id ·çÇÁ Å¸ÀÓ¾Æ¿ô¿¡¼­ »ç¿ë
+	int timeout_id;
 	int calltime_id;
 	int calltime_MADC_id;
 	int calltime_cloud_id;
 
-	int secretlongcount; //ºñ¹Ğ¹øÈ£Æ²¸°È½¼ö¼¼±â
+	int secretlongcount;
 };
 
 struct artikvariable{
