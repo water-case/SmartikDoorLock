@@ -9,7 +9,7 @@ artik_bluetooth_module *bt = NULL;
 artik_cloud_module *cl = NULL;
 
 
-//gpio ÇÉ
+// gpio í•€ êµ¬ì¡°ì²´
 struct gpio_pins gpio_pins[] = {
 	{ NULL, { KEY0, "key0", GPIO_OUT, GPIO_EDGE_NONE, 0, NULL } },
 	{ NULL, { KEY1, "key1", GPIO_OUT, GPIO_EDGE_NONE, 0, NULL } },
@@ -21,13 +21,13 @@ struct gpio_pins gpio_pins[] = {
 	{ NULL, { MOTOR0, "motor0", GPIO_OUT, GPIO_EDGE_NONE, 0, NULL } },
 	{ NULL, { MOTOR1, "motor1", GPIO_OUT, GPIO_EDGE_NONE, 0, NULL } },
 	{ NULL, { BUTTON, "button", GPIO_IN, GPIO_EDGE_NONE, 1, NULL } } };
-//adc ÇÉ
+// adc í•€ êµ¬ì¡°ì²´
 struct adc_pins adc_pins[] = {
 	{ NULL, { m_pin, "red", NULL } },
 	{ NULL, { t_pin, "red", NULL } },
 	{ NULL, { b_pin, "red", NULL } },
 	{ NULL, { d_pin, "red", NULL } }, };
-//pwmÇÉ
+// pwm í•€ êµ¬ì¡°ì²´
 struct pwm_pins pwm_pins[] = {
 	{NULL,{LED0,"led0",1000*1000,1000,ARTIK_PWM_POLR_NORMAL,NULL}} };
 
@@ -45,20 +45,15 @@ struct artikvariable artikvariable =  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 void Settinginitial()
 {
 	int i;
-	//»ç¿ëÇÒ ¸ğµâ ¼³Á¤
-	Modulesetting();
 
-	////////////////////////////////////////////////////////////////
-	//¿©±âºÎºĞ ÇÉ¹öÆ° ¿À·ù ÇØ°áÀ§ÇÑ ÇÒ´ç/ÇÒ´çÇØÁ¦ÇÔ
-	Assignment();
-	Remove();
-	//////////////////////////////////////////////////////////////
-	//ÇÉ ÇÒ´ç
-	Assignment();
+	Modulesetting();// ì‚¬ìš©í•  ëª¨ë“ˆ ì´ˆê¸° ì„¸íŒ…
 
-	pwm->set_duty_cycle(pwm_pins[led0].handle,0); // ºÒ²¨³õ°í½ÃÀÛ
+	Assignment(); 	// ëª¨ë“ˆ ë¬¸ì œë¡œ ì¸í•œ ì´ˆê¸° í• ë‹¹ ë° í• ë‹¹í•´ì œê°€ í•„ìš”í•˜ì—¬ ì‚½ì…
+	Remove();		// ëª¨ë“ˆ ë¬¸ì œë¡œ ì¸í•œ ì´ˆê¸° í• ë‹¹ ë° í• ë‹¹í•´ì œê°€ í•„ìš”í•˜ì—¬ ì‚½ì…
 
+	Assignment();	// í•€ í• ë‹¹
 
+	pwm->set_duty_cycle(pwm_pins[led0].handle,0); // í‚¤íŒ¨ë“œì˜ ë¶ˆì„ êº¼ì§„ìƒíƒœë¡œ ì„¸íŒ…
 }
 
 void Modulesetting()
@@ -76,13 +71,13 @@ void Modulesetting()
 void Assignment()
 {
 	int i;
-	//gpio ¼³Á¤ ÇÒ´ç
+	// gpio í•€ í• ë‹¹
 	for (i = 0; i < (sizeof(gpio_pins) / sizeof(*gpio_pins)); i++){
 		gpio->request(&gpio_pins[i].handle, &gpio_pins[i].config);}
-	//adc ¼³Á¤
+	// adc í•€ í• ë‹¹
 	for (i = 0; i < (sizeof(adc_pins) / sizeof(*adc_pins)); i++){
 		adc->request(&adc_pins[i].handle, &adc_pins[i].config);}
-	//pwmÇÉ ¼³Á¤ ÇÒ´ç
+	// pwm í•€ í• ë‹¹
 	for (i = 0; i < (sizeof(pwm_pins) / sizeof(*pwm_pins)); i++){
 		pwm->request(&pwm_pins[i].handle, &pwm_pins[i].config);}
 }

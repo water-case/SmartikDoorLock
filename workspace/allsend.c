@@ -2,6 +2,10 @@
 
 extern char pub_msg[MAX_MSG_LEN];
 
+/**
+*	블루투스 임시비밀번호를 클라우드로 전송함
+*	클라우드에 임시비밀번호 전송시 트리거로 등록된 카카오톡 또는 라인들로 임시비밀번호가 전송됨
+*/
 void SendSNum(){
 	strcpy(pub_msg, "{\"state\":    }");
 	strncpy(pub_msg+9, charvariable.SNum, 4);
@@ -11,7 +15,10 @@ void SendSNum(){
 	send_cloud_message(pub_msg);
 }
 
-
+/**
+*	블루투스 임시비밀번호로 입장할경우 일반 입장과는 다른 성공메시지를 클라우드로 보냄
+*	일반 성공시 카카오톡과 라인으로 전송되는 메시지에 구별되어짐
+*/
 void SendBluep()
 {
 	strcpy(pub_msg, "{\"bluep\":    }");
@@ -21,6 +28,12 @@ void SendBluep()
 	send_cloud_message(pub_msg);
 }
 
+/**
+*	비밀번호를 3번틀리면 클라우드로 경고 전송
+*	클라우드에 경고알림 도착시 트리거로 등록된 카카오톡 또는 라인들로 경고 알림이 전송됨
+*	
+*	*특이사항으로 함수 파라미터로 1이 전송되면 인증키 폐기라는 특수한 행동하도록 구현함
+*/
 void SendWrong(int a)
 {
 	int i;
@@ -32,22 +45,13 @@ void SendWrong(int a)
 
 	printf("pub_msg : %s,  size : %d\n", pub_msg, sizeof(pub_msg));
 	send_cloud_message(pub_msg);
-
-		//strcpy(pub_msg, );
-	//else if(a==2) send_cloud_message("{\"wrong\":0002}");
-		//strcpy(pub_msg, "{\"wrong\":0002}");
-	//else if(a==3) send_cloud_message("{\"wrong\":0003}");
-		//strcpy(pub_msg, "{\"wrong\":0003}");
-	//else
-		//strcpy(pub_msg, "{\"wrong\":0000}");
-
-	/*strcpy(pub_msg, "{\"wrong\":0000}");
-	strncpy(pub_msg+12, a , 1);*/
-
-
-	//send_cloud_message(pub_msg);
 }
 
+/**
+*	입출입 기록을 클라우드로 전송함
+*	클라우드로 전송시 트리거로 등록된 카카오톡 또는 라인들로 알림전송
+*	알림에는 입출입시간 + 등록된 기기정보를 활용한 사용자이름이 전송됨
+*/
 void SendTime()
 {
 	int a;
@@ -90,8 +94,8 @@ void SendTime()
 		send_cloud_message(pub_msg);
 	}
 
-
-	FILE *fop;											//������ð�, �����������ּ� ��⳻ ����
+	// 입출입 기록을 기기내에도 저장함
+	FILE *fop;
 	fop = fopen("/root/doorlockdocument.txt", "a+");
 	fprintf(fop, "TIME %04d-%02d-%02d %02d:%02d:%02d \nBLUETOOTHMAC %s \n\n",
 			today->tm_year + 1900,

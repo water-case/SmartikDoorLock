@@ -3,42 +3,35 @@
 extern struct gpio_pins gpio_pins[10];
 extern struct adc_pins adc_pins[4];
 extern struct pwm_pins pwm_pins[1];
-///////////////////////////////////////////////////
 
 int main(void)
 {		
-	int i;	//for±¸¹®¿¡¼­»ç¿ëÇÔ
-	//ÃÊ±â¼³Á¤
-	Settinginitial();	//settinginitial.c
+	int i;
+	// ì´ˆê¸° ì…‹íŒ… í•¨ìˆ˜
+	Settinginitial();
 
-	//ºí·çÅõ½º ½ºÄµ Äİº¤¼³Á¤
-	//bt->set_callback(BT_EVENT_SCAN, scan_callback, (void*)bt);
-
-	//ÃÊ±âÆ½¼³Á¤
+	// ì´ˆê¸° ì•„í‹± ì„±ì •
 	artikvariable.initime=timer->get_tick();
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//ÆÄÀÏÀÔÃâ·Â ( ºñ¹Ğ¹øÈ£ ÀĞ¾î¿À±â , ÀúÀå¹× º¯°æÇÏ±â À§ÇØ ÆÄÀÏÀÔÃâ·ÂÀ¸·Î)
+
+	// ê¸°ê¸°ë‚´ ì €ì¥ëœ ë¹„ë°€ë²ˆí˜¸ ì½ì–´ì˜¤ê¸°
 	FILE *fop;
 	if( fop = fopen("/root/secretnum.txt", "r+"))
 	{
 		fscanf(fop, "%s", &charvariable.ONum);
 	}
 	fclose(fop);
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//ÀÎÁõÅ°¸¸µë
+
+	// ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦í‚¤ ì´ˆê¸°í™”
 	srand((unsigned)time(NULL));
 	DeleteSNum();
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ê¸°ê¸° ë©”ì¸ ë™ì‘ ë£¨í”„ë¬¸
 	while(1)
 	{
 		artik_ssl_config ssl_config = {0};
 		artik_websocket_handle handle;
 		cl->websocket_open_stream(&handle, device_id, token, &ssl_config);
 		cl->websocket_set_connection_callback(handle, websocket_connection_callback, &handle);
-		//cl->websocket_set_receive_callback(handle,websocket_receive_callback,NULL);
-		//gpio->set_change_callback(gpio_pins[button].handle,interupt_button,NULL);
-		//pwm->set_period(pwm_pins[led0].handle,1000);
-		//pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
 		loop->add_periodic_callback(&intvariable.calltime_MADC_id,100,LOOP,NULL);
 		loop->run();
 	}

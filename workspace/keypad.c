@@ -6,7 +6,6 @@ extern struct pwm_pins pwm_pins[1];
 extern char pub_msg[MAX_MSG_LEN];
 
 void Check(bool checknum) {
-	//printf("RESET %X \n",charvariable.flg_door);
 	int i;
 	unsigned char key=0,row;
 	for(row=0x01; row<0x10;row<<=1) {
@@ -29,23 +28,20 @@ void Check(bool checknum) {
 	gpio->write(gpio_pins[key2].handle,0);
 	gpio->write(gpio_pins[key3].handle,0);
 
-	//ÀÔ·Â¹ŞÀº Å°¸¦ ¾îµò°¡¿¡ ÀúÀåÇÏ°í
-	//*Å°°¡ ´­¸®¸é 2Â÷ ºñ¹Ğ¹øÈ£¿Í ºñ±³ÇÑ´Ù.
-	//ºñ¹Ğ¹øÈ£ ÀÎÁõÀ» Åë°úÇÏ¸é, ÃÊ±âÈ­ °úÁ¤À» °ÉÄ¡°í, flg_door=0x51ÀÌ µÈ´Ù.
+	/**
+	*	ì…ë ¥ë°›ì€ í‚¤ë¥¼ ë”°ë¡œ ì €ì¥í•˜ê³  *ê°€ ëˆŒë¦¬ë©´ ë¸”ë£¨íˆ¬ìŠ¤ ë¹„ë°€ë²ˆí˜¸ ëª¨ë“œë¡œ ë³€í™˜
+	*/
 	if(key==12) {
 		if(boolvariable.keypad_timer==0) {
 			artikvariable.keypad_initime = timer->get_tick();
 			boolvariable.keypad_timer=1;
 			artikvariable.keypad_delaytime=1000*3000;
-			//Sound("/root/beep.wav");
 		}
 		artikvariable.keypad_newtime=timer->get_tick();
 		if(artikvariable.keypad_newtime-artikvariable.keypad_initime>artikvariable.keypad_delaytime) {
-			//ÃÊ±âÈ­
 			charvariable.flg_door=0x00;
 			boolvariable.keypad_timer=0;
 			printf("Time over!!!!\n");
-			//flash(2,2);
 			originflash(10,50);
 			charvariable.inputleng=0;
 			strcpy(&charvariable.inputSNum,"    ");
@@ -56,9 +52,11 @@ void Check(bool checknum) {
 			bt->stop_scan();
 			bt->unset_callback(BT_EVENT_SCAN);
 		}
-	}else {
+	}
+	else {
 		artikvariable.keypad_initime = timer->get_tick();
 		charvariable.flg_door &= ~0b01000000;
+		// ë¸”ë£¨íˆ¬ìŠ¤ ëª¨ë“œ
 		if(checknum == 0){
 			if(key != 9) {
 				if(charvariable.inputleng<4) {
@@ -67,34 +65,31 @@ void Check(bool checknum) {
 					charvariable.inputSNum[charvariable.inputleng]=charvariable.keyPadMatrix[key];
 					charvariable.inputleng++;
 					printf("Clicked SNumber : %s\n", charvariable.inputSNum);
-					//flash(10,0.01);
-					//originflash(1,10);
 				}
 				if(charvariable.inputleng==4) {
-					if(!strcmp("0000",charvariable.inputSNum)) {						//ÀÎÁõÅ°¿äÃ»
+					// ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦í‚¤ë¥¼ ìš”ì²­í•œë‹¤
+					if(!strcmp("0000",charvariable.inputSNum)) {
 						MakeSNum();
-						//flash(5,1);
 						originflash(3,300);
-						SendSNum();//ºí·çÅõ½º 2Â÷ ºñ¹Ğ¹øÈ£ Å¬¶ó¿ìµå·Î Àü¼Û
+						SendSNum(); // ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦í‚¤ í´ë¼ìš°ë“œë¡œ ì „ì†¡
 						charvariable.inputleng=0;
-						//boolvariable.startInput=0;
 						strcpy(&charvariable.inputSNum,"    ");
-						//pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
 					}
-					else if(!strcmp("0001",charvariable.inputSNum)) {				//ÀÎÁõÅ°Æó±â
+					// ë°œê¸‰ëœ ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦í‚¤ë¥¼ íê¸°í•œë‹¤
+					else if(!strcmp("0001",charvariable.inputSNum)) {
 						DeleteSNum();
 						//flash(5,1);
 						originflash(5,200);
-						SendWrong(1);			//Å¬¶ó¿ìµå·Î ÀÎÁõÅ°Æó±âµÊÀ» ¾Ë¸²
+						// í´ë¼ìš°ë“œë¡œ ì¸ì¦í‚¤ íê¸°ë¥¼ ì•Œë¦¼
+						SendWrong(1);
 						charvariable.inputleng=0;
 						strcpy(&charvariable.inputSNum,"    ");
-						//intvariable.secretlongcount = 0;
-						//boolvariable.startInput=0;
 						printf("resetSNum\n");
 						printf("SNum : %s\n", charvariable.SNum);
 						printf("wrong_msg : %s,  size : %d\n", pub_msg, sizeof(pub_msg));
-						//pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
-					}else if(!strcmp(charvariable.SNum,charvariable.inputSNum)) {					//ÀÎÁõÅ°·Î¼º°ø½Ã
+					}
+					// ë¸”ë£¨íŠ¸ìŠ¤ ì¸ì¦í‚¤ í†µê³¼ì‹œ
+					else if(!strcmp(charvariable.SNum,charvariable.inputSNum)) {
 						if(!boolvariable.keycheck)
 							Sound("/root/pass.wav");
 						bt->stop_scan();
@@ -111,28 +106,28 @@ void Check(bool checknum) {
 						strcpy(charvariable.saveblue, "00000000000000000");
 						printf("saveblue : %s\n", charvariable.saveblue);
 						boolvariable.bluecheck = 1;
-					}else if( (charvariable.inputleng==4) && intvariable.secretlongcount == 2 ) { //3¹øÀÌ»ó Æ²¸®¸é ´Ù½Ã Ã³À½ºÎÅÍ
+					}
+					// ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦í‚¤ 3ë²ˆì´ìƒ í‹€ë¦¬ë©´ í´ë¼ìš°ë“œë¡œ ê²½ê³ ì•Œë¦¼ ë³´ëƒ„
+					else if( (charvariable.inputleng==4) && intvariable.secretlongcount == 2 ) {
 						Sound("/root/longlonglongnum.wav");
-						strcpy(pub_msg, "{\"wrong\":0002}");			// ºí·çÅõ½º¹øÈ£Æ²¸°°Å 0002 , ºñ¹Ğ¹øÈ£Æ²¸°°Å 0003
+						strcpy(pub_msg, "{\"wrong\":0002}");
 						MakeSNum();
-						//flash(2,2);
 						originflash(10,50);
-						SendWrong(2);
+						SendWrong(2); // í´ë¼ìš°ë“œë¡œ ê²½ê³ ì•Œë¦¼ ë³´ëƒ„
 						charvariable.inputleng=0;
 						strcpy(&charvariable.inputSNum,"    ");
 						printf("SNum longlonglong!!!!\ncome back start!!!\n");
 						intvariable.secretlongcount = 0;
-						//boolvariable.startInput=0;
 						charvariable.flg_door = 0xD0;
-						//pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
-					}else if( (charvariable.inputleng==4) && (strcmp(charvariable.SNum,charvariable.inputSNum) ) ) {		//ÀÎÁõÅ° Æ²¸®¸é
-						//flash(3,1);
+					}
+					/**
+					*	ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦í‚¤ í‹€ë ¸ì„ ê²½ìš° ê²½ê³  ì†Œë¦¬ë‚¨
+					*/
+					else if( (charvariable.inputleng==4) && (strcmp(charvariable.SNum,charvariable.inputSNum) ) ) {
 						charvariable.inputleng=0;
-						//boolvariable.startInput=0;
 						strcpy(&charvariable.inputSNum,"    ");
 						intvariable.secretlongcount++;
 						printf("SNum long\n");
-						//pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
 						if(intvariable.secretlongcount ==1)
 							Sound("/root/longnum.wav");
 						else
@@ -140,37 +135,30 @@ void Check(bool checknum) {
 						originflash(5,80);
 					}
 				}
-			}else {
-				if(boolvariable.keycheck != 1) {		//#´©¸£¸é ²¨ º´Ù ÄÑ º´ÙÇÏµµ·Ï
+			}
+			// í‚¤íŒ¨ë“œì˜ #ë²„íŠ¼ìœ¼ë¡œ ë¸”ë£¨íˆ¬ìŠ¤ ëª¨ë“œì™€ ì¼ë°˜ ëª¨ë“œ ë³€ê²½í•¨
+			else {
+				if(boolvariable.keycheck != 1) {
 					Sound("/root/changenum.wav");
 					boolvariable.startInput=0;
-					//pwm->set_period(pwm_pins[led0].handle,1000);
 					pwm->set_duty_cycle(pwm_pins[led0].handle,1000*1000);
 					charvariable.inputleng=0;
 					strcpy(&charvariable.inputSNum,"    ");
 				}
 			}
-		}else if(checknum == 1) {
-			//flashoff();
-			//flash(7,0.05);
-			//pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
-			//charvariable.flg_door |= 0x01;
-			//originflash(1,10);
-
+		}
+		// ì¼ë°˜ ëª¨ë“œ
+		else if(checknum == 1) {
 			if(key!=9 && charvariable.inputleng<6) {
 				if(charvariable.inputleng != 5)
 						Sound("/root/beep.wav");
 				charvariable.inputONum[charvariable.inputleng]=charvariable.keyPadMatrix[key];
 				charvariable.inputleng++;
 				printf("Clicked ONumber : %s\n leng = %d\n", charvariable.inputONum, charvariable.inputleng);
-				//flash(10,0.01);
-				/*pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
-				usleep(1000*100);
-				pwm->set_duty_cycle(pwm_pins[led0].handle,1000*1000);*/
 
 				pwm->set_duty_cycle(pwm_pins[led0].handle,1000*1000);
 			}else if(key == 9 && !boolvariable.bluecheck) {
-				if(!boolvariable.startInput) {					//#´©¸£¸é ²¨ º´Ù ÄÑ º´ÙÇÏµµ·Ï
+				if(!boolvariable.startInput) {
 				boolvariable.startInput=1;
 				pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
 				charvariable.inputleng=0;
@@ -187,13 +175,14 @@ void Check(bool checknum) {
 					charvariable.inputleng=0;
 					boolvariable.keytwinkle = 0;
 					strcpy(&charvariable.inputONum,"      ");
-					pwm->set_duty_cycle(pwm_pins[led0].handle,1000);					//ÀÌÈÄ¼³Á¤
+					pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
 					boolvariable.keycheck = 1;
 					boolvariable.startInput=1;
-				}else if( (charvariable.inputleng==6) && intvariable.secretlongcount == 2 ) {		//3¹øÀÌ»óÆ²¸®¸é Ã³À½ºÎÅÍ
+				}
+				// 3ë²ˆì´ìƒ í‹€ë¦¬ë©´ í´ë¼ìš°ë“œë¡œ ê²½ê³ ì•Œë¦¼ë³´ëƒ„
+				else if( (charvariable.inputleng==6) && intvariable.secretlongcount == 2 ) {
 					Sound("/root/longlonglongnum.wav");
-					strcpy(pub_msg, "{\"wrong\":0003}");					// ºí·çÅõ½º¹øÈ£Æ²¸°°Å 0001 , ºñ¹Ğ¹øÈ£Æ²¸°°Å 0003
-					//flash(2,2);
+					strcpy(pub_msg, "{\"wrong\":0003}");
 					originflash(10,50);
 					SendWrong(3);
 					charvariable.inputleng=0;
@@ -203,8 +192,9 @@ void Check(bool checknum) {
 					charvariable.flg_door = 0xD0;
 					intvariable.secretlongcount = 0;
 					boolvariable.startInput=0;
-					//pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
-				}else if( (charvariable.inputleng==6) && (strcmp(charvariable.ONum,charvariable.inputONum) ) ) {
+				}
+				// ë¹„ë°€ë²ˆí˜¸ í‹€ë ¸ì„ê²½ìš° ê²½ê³ ì†Œë¦¬ë‚¨
+				else if( (charvariable.inputleng==6) && (strcmp(charvariable.ONum,charvariable.inputONum) ) ) {
 					if(intvariable.secretlongcount ==0)
 						Sound("/root/longnum.wav");
 					else
@@ -214,8 +204,6 @@ void Check(bool checknum) {
 					strcpy(&charvariable.inputONum,"      ");
 					intvariable.secretlongcount++;
 					printf("ONum long\n");
-
-					//flash(3,1);
 					originflash(5,80);
 				}
 			}
@@ -223,9 +211,10 @@ void Check(bool checknum) {
 	}
 }
 
+// ë¬¸ì´ ì—´ë¦´ë•Œ ë°”ë€ í”Œë˜ê·¸ë¥¼ ë‹«íë•Œ í”Œë˜ê·¸ë¥¼ ë°”ê¿ˆ
 void ResetKeyFlg(void) {
 	if((gpio->read(gpio_pins[key4].handle)==1)&&(gpio->read(gpio_pins[key5].handle)==1)&&(gpio->read(gpio_pins[key6].handle)==1)) {
-		charvariable.flg_door |= 0x40;	//keyÇÃ·¡±×¸¦ ÄÒ´Ù.
+		charvariable.flg_door |= 0x40;
 	}
 }
 

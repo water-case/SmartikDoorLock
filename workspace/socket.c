@@ -2,7 +2,6 @@
 
 char pub_msg[MAX_MSG_LEN] = "{\"state\":0000}";
 
-///websocke///
 void websocket_connection_callback(void *user_data, void *result)
 {
     intptr_t connected = (intptr_t)result;
@@ -20,9 +19,7 @@ void websocket_receive_callback(void *user_data, void *result)
     printf("received: %s\n", buffer);
     free(result);
 }
-////websocket
 
-////cloud////
 artik_error send_cloud_message( const char *msg )
 {
 	artik_cloud_module *cloud = (artik_cloud_module *)artik_request_api_module("cloud");

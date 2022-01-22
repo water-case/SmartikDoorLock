@@ -5,6 +5,7 @@ extern struct adc_pins adc_pins[4];
 extern struct pwm_pins pwm_pins[1];
 extern char pub_msg[MAX_MSG_LEN];
 
+// í”„ë¡œê·¸ë¨ ë©”ì¸ ë£¨í”„
 bool LOOP(){
 	if(!gpio->read(gpio_pins[button].handle)){
 		if(boolvariable.door==close)	{
@@ -19,72 +20,89 @@ bool LOOP(){
 			SendWrong(4);
 			charvariable.flg_door=0x00;
 			boolvariable.startInput=false;
-			charvariable.detectcnt =0; 		//ÇÑ¹øÇàµ¿³¡³ª¸é ´Ù½ÃÇÏµµ·Ï ÃÊ±âÈ­
+			charvariable.detectcnt =0;
 			boolvariable.bluecheck = 0;
 			boolvariable.keycheck = 0;
 			pwm->set_duty_cycle(pwm_pins[led0].handle,1000);
 		}
 	}	
-	if(boolvariable.door==close&&(charvariable.flg_door==0x00)){			//¸ğ¼ÇÀÎ½Ä Á¶°Ç-¹®ÀÌ ´İÇôÀÖ°í ¾Æ¹« µ¿ÀÛÀÌ ¾ø´Â »óÅÂ
-		if(MADC()==true){				//MADC Áö±İ ¸ğ¼ÇÀÎ½ÄÀÌ HIGH / LOWÀÎÁö ÆÇ´Ü
+	/**
+	*	ì ì™¸ì„  ì„¼ì„œë¥¼ ì´ìš©í•œ ì›€ì§ì„ ê²€ì‚¬
+	*	ì›€ì§ì„ì´ ìƒê¸°ë©´ í‚¤íŒ¨ë“œì— ë¶ˆë“¤ì–´ì˜¤ë©´ ì¡°ì‘ì´ ê°€ëŠ¥í•´ì§
+	*	ì›€ì§ì„ì´ ìƒê¸°ë©´ ë¸”ë£¨íˆ¬ìŠ¤ ìŠ¤ìº”ì‹œì‘í•˜ì—¬ ê¸°ê¸° íƒìƒ‰
+	*/
+	if(boolvariable.door==close&&(charvariable.flg_door==0x00)){
+		if(MADC()==true){
 			printf("Motion Detected\n");
 			if(boolvariable.inertblue==1)
 				boolvariable.bluecheck=1;
-			bt->start_scan(); //-> ½ºÄµÀÌ ¿Ï·áµÇ¸é ¾ø¿¡¾ßÇÔ.
-			bt->set_callback(BT_EVENT_SCAN, scan_callback, (void*)bt); // ½ºÄµÄİ¹é,
+			bt->start_scan();
+			bt->set_callback(BT_EVENT_SCAN, scan_callback, (void*)bt);
 
-			charvariable.flg_door=0xD0; //¸ğ¼ÇÀÎ½ÄÅë°ú ÇÃ·¡±×
-			//flash(5,1);
-			//originflash(3,300);
-			pwm->set_duty_cycle(pwm_pins[led0].handle,1000*1000);	 // ¸ğ¼ÇµÇ¸é Å°ÆĞµå ÄÑÁö°í, ±ôºı
-										 // ºí·çÅõ½ºÀÏ¶© ¹İ´ë·ÎÇÏµµ·Ï
+			charvariable.flg_door=0xD0
+			pwm->set_duty_cycle(pwm_pins[led0].handle,1000*1000);
 		}
 	}
-	if(charvariable.flg_door==0x90||charvariable.flg_door==0x11||charvariable.flg_door==0x10) {	//Å°ÃÊ±âÈ­ ÀÛ¾÷
+	if(charvariable.flg_door==0x90||charvariable.flg_door==0x11||charvariable.flg_door==0x10) {
 		ResetKeyFlg();
-	}else if(charvariable.flg_door==0xD0 && boolvariable.door==close ) {	// Á¶°Ç-¸ğ¼ÇÀÎ½ÄÀÌ µÈ»óÅÂ
-		//±âº»ÀûÀ¸·Î´Â Å°ÆĞµåÀÔ·ÂÀÌ°í, #´­·¶À»¶§´Â ºí·çÅõ½ºÀÎÁõÅ°¸ğµå
+	}
+	/**
+	*	ëª¨ì…˜ì¸ì‹ì´ ëœ ìƒíƒœì¼ë•Œ í‚¤íŒ¨ë“œì…ë ¥ëª¨ë“œì™€ ë¸”ë£¨íˆ¬ìŠ¤ì¸ì¦ëª¨ë“œ êµ¬ë¶„ ë¹„íŠ¸ì— ë”°ë¼ ë¶„ê¸°
+	*/
+	else if(charvariable.flg_door==0xD0 && boolvariable.door==close ) {
 		if(boolvariable.startInput == 0) {
-			//pwm->set_duty_cycle(pwm_pins[led0].handle,1000*1000);
 			Check(1);
 		}else {
 			Check(0);
 		}
-		//Check(0); //ºí·çÅõ½º Åë°úÅ° Ã¼Å©
-////////////////////////////////////////////////////////////////////////// ºí·çÅõ½ºÀÎÁõÀÎ Å¬¶ó¿ìµåÀü¼Û
-	}else if(charvariable.flg_door==0x51) { //51-> ¸ğ¼ÇÀÎ½ÄÈÄ ºí·çÅõ½ºÀÎÁõ Åë°úµÈ°æ¿ì
+	}
+	/**
+	*	51 = ì›€ì§ì„ ê°ì§€ ì´í›„ ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦ì´ í†µê³¼ëœ ê²½ìš° 50ìœ¼ë¡œ ë³€ê²½
+	*/
+	else if(charvariable.flg_door==0x51) {
 		pwm->set_duty_cycle(pwm_pins[led0].handle,1000*1000);
 		charvariable.flg_door=0x50;
-	}else if(charvariable.flg_door==0x50) {
+	}
+	/**
+	*	50 = ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦ê¹Œì§€ ëœ ê²½ìš°
+	*	ì¼ë°˜í‚¤ ëª¨ë“œë¡œ ë³€ê²½
+	*/
+	else if(charvariable.flg_door==0x50) {
 		if(boolvariable.keytwinkle == 0) {
 			printf("Key Click please~\n");
 			boolvariable.keytwinkle = 1;
 		}
-		//Check(1); //ºñ¹Ğ¹øÈ£Ã¼Å©
 	}
-
+	/**	
+	*	ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦ê³¼ ì¼ë°˜ ë¹„ë°€ë²ˆí˜¸ê¹Œì§€ í†µê³¼í–ˆì„ ê²½ìš° flagë¥¼ 30ìœ¼ë¡œ ë³€ê²½
+	*/
 	if(boolvariable.bluecheck == 1 && boolvariable.keycheck == 1)
 		charvariable.flg_door=0x30;	
 
-
+	/**
+	*	ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦ê³¼ ì¼ë°˜ ë¹„ë°€ë²ˆí˜¸ê¹Œì§€ í†µê³¼í–ˆì„ ê²½ìš° ì‘ì—…
+	*/
 	if((charvariable.flg_door==0x30)&&(boolvariable.door==close)) {
-		Open();
+		Open(); // ë¬¸ì—´ê¸°
 		printf("Door open!! \n");
 		originflash(10,30);
-		charvariable.flg_door = 0x22; 		//¸ğÅÍ´Ş±âÀü Å×½ºÆ®¿ë
+		charvariable.flg_door = 0x22; 
 
-		SendTime();				//ÇöÀç½Ã°£ °¡Á®¿À°í, ¸ÆÁÖ¼ÒÀúÀå
-		//½Ã°£À» °¡Á®¿Í Å¬¶ó¿ìµå¿¡ ±â·ÏÇÑ´Ù.	gpi07¹øÀÌ ¿­¸±¶§ 1
+		SendTime(); // í˜„ì¬ì‹œê°„ê³¼ MAC Addressë¥¼ ê¸°ê¸°ì™€ í´ë¼ìš°ë“œì— ê¸°ë¡í•¨
 
 		printf("\n");
 	}
-			// ºñ¹Ğ¹øÈ£º¯°æÇÏ±âÃß°¡
+	/**
+	*	ë¬¸ì—´ë¦° ìƒíƒœì—ì„œ ë¬¸ë‹«í˜ ë²„íŠ¼ ëˆ„ë¥´ë©´ ë¬¸ë‹«í˜
+	*/
 	if((charvariable.flg_door==0x22)&&(boolvariable.door==open)) {
-		Close();		//¹®´İÈû
+		Close();
 	}
 
-	return 1; // ·çÇÁ¿¡¼­ ÁÖ±âÀûÀ¸·Î ½ÇÇàµÇµµ·Ï ¼³Á¤
+	return 1;
 }
+
+// ì‹œê°„ì´ ì´ˆê³¼ë˜ë©´ ë£¨í”„ë¥¼ ëëƒ„
 void on_timeout_callback(void *user_data) {
 	artik_loop_module *loop = (artik_loop_module *) user_data;
 	loop->quit();

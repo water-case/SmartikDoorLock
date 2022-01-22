@@ -2,23 +2,25 @@
 
 extern char pub_msg[MAX_MSG_LEN];
 
+// ëœë¤í•œ ë¸”ë£¨íˆ¬ìŠ¤ ì¸ì¦í‚¤ ìƒì„±
 void MakeSNum(){
 	int i, a;
 
-	a=rand()%9+1;				//1¹øÂ° ÀÚ¸®´Â 1~9¹üÀ§
+	a=rand()%9+1;
 	charvariable.SNum[0]=charvariable.SNumMatrix[a];
 
-	for(i=1;i<4;i++){			//234¹øÂ° ÀÚ¸®´Â 0~9¹üÀ§·Î
+	for(i=1;i<4;i++){
 		a=rand()%10;
 		charvariable.SNum[i]=charvariable.SNumMatrix[a];
 	}
 	printf("makeSNum : %s\n", charvariable.SNum);
 }
 
+// ë¸”ë£¨íŠ¸ìŠ¤ ì¸ì¦í‚¤ íê¸°
 void DeleteSNum(){
 	int i;
 
-	for(i=1;i<4;i++){			//´Ù ³Î°ªÀ¸·Î
+	for(i=1;i<4;i++){
 			charvariable.SNum[i]=NULL;
 		}
 }
@@ -30,14 +32,12 @@ void scan_callback(artik_bt_event event, void *data, void *user_data) {
 	char* bluekey;
 	printf("dev : %s \n",dev->remote_address);
 
-	///////////////////////////////////////////////////////////////////////////
-	//ºí·çÅõ½º Å°°ª ÆÄÀÏÀÔÃâ·ÂÀ¸·Î °¡Á®¿À±â
+	// ê¸°ê¸°ë‚´ ë“±ë¡ëœ ë¸”ë£¨íˆ¬ìŠ¤ MAC Address ëª©ë¡ ê°€ì ¸ì˜¤ê¸°
 	fop = fopen("/root/bluetoothkey.txt", "r+");
 
+	// ê¸°ê¸° ì£¼ë³€ ë¸”ë£¨íˆ¬ìŠ¤ MAC Address íƒìƒ‰
 	while(fgets(bluekey,28,fop)) {
 		if(strncmp(dev->remote_address,bluekey, sizeof(bluekey)) == 0) {
-			//ºí·çÅõ½º ½ºÄµ ¼º°ø
-			//ºí·çÅõ½º ½ºÄµ ÁßÁö
 			bt->stop_scan();
 			bt->unset_callback(BT_EVENT_SCAN);
 			if(boolvariable.keycheck == 0)
@@ -58,5 +58,4 @@ void scan_callback(artik_bt_event event, void *data, void *user_data) {
 		printf("saveblue : %s\n", charvariable.saveblue);
 	}
 	fclose(fop);
-	////////////////////////////////////////////////////////////////////////////
 }
