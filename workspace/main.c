@@ -6,7 +6,6 @@ extern struct pwm_pins pwm_pins[1];
 
 int main(void)
 {		
-	int i;
 	// 초기 셋팅 함수
 	Settinginitial();
 
